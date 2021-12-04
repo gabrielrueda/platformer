@@ -63,6 +63,8 @@ game_window = pygame.display.set_mode(windowSize)
 pygame.display.set_caption('2D Platformer')
 fps = pygame.time.Clock()
 
+platforms = []
+
 def bgAndWalkways():
     # Clear canvas
     game_window.fill(black)
@@ -75,11 +77,34 @@ def bgAndWalkways():
     game_window.blit(grass_TC, (335,300))
     game_window.blit(grass_TR, (375,300))
     game_window.blit(grass_MR, (375,340))
-    game_window.blit(leftLedge,(415,300))
-    game_window.blit(regLedge,(450,300))
-    game_window.blit(regLedgePole,(485,300))
-    game_window.blit(regLedge,(485+50,300))
 
+    game_window.blit(leftLedge,(415,300))
+    platforms.append([300,415,450])
+
+    game_window.blit(regLedge,(450,300))
+    platforms.append([300,450,485])
+
+    game_window.blit(regLedgePole,(485,300))
+    platforms.append([300,485,535])
+
+    game_window.blit(regLedge,(535,300))
+    platforms.append([300,535,585])
+
+
+def overPlatform(midX,botY):
+    counter = 0
+    for i in platforms:
+        # if botY <= i[0]-70 and midX >= i[1] and midX <= i[2]:
+        #     over = 1
+        print(midX < i[1] or midX > i[2])
+        if midX < i[1] or midX > i[2]:
+            # print("NOt on platform")
+            counter += 1
+    if(counter == len(platforms)):
+        return 2
+    else:
+        return 0
+            
 
 def main():
     start_ticks=pygame.time.get_ticks()
@@ -113,10 +138,19 @@ def main():
 
         bgAndWalkways()
         pos = g*(seconds*seconds) -200*seconds +230
-        if(pos <= 230 or jump == True):
+        test = overPlatform(x+25,pos)
+        before = 0
+        
+        if test == 2:
+            if(before == 0):
+                start_ticks=pygame.time.get_ticks()
+                before = 2
+            game_window.blit(skeleton, (x, int(pos)))
+        elif test == 1 or jump == True :
              game_window.blit(skeleton, (x, int(pos)))
              jump = False
         else:
+            before = 0
             game_window.blit(skeleton, (x, 231))
             
             
