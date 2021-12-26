@@ -8,6 +8,13 @@ import os
 pygame.init()
 vec = pygame.math.Vector2  # 2 for two dimensional
 
+#Colours
+black = pygame.Color(0, 0, 0)
+darkPurple = pygame.Color(19,12,55)
+red = pygame.Color(255, 0, 0)
+green = pygame.Color(0, 255, 0)
+blue = pygame.Color(0, 0, 255)
+
 # Global Constants
 HEIGHT = 600
 WIDTH = 1200
@@ -18,7 +25,8 @@ FPS = 60
 # Global Variables
 moveRight = False
 moveLeft = False
-imgScale = 5 
+imgScale = 5
+bgScale = 8
 FramePerSec = pygame.time.Clock()
 
 # Sprite Sheets
@@ -29,6 +37,7 @@ tileset = pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/t
 # Images from Sprite Sheet
 skeleton = pygame.transform.scale(skelSheet.subsurface((5,25,10,14)), (imgScale*10, imgScale*14))
 regLedge = pygame.transform.scale(tileset.subsurface((80,24,7,7)), (imgScale*7, imgScale*7))
+background = pygame.transform.scale(tileset.subsurface((112,33,64,31)), (64*bgScale,31*bgScale))
 
 
 # Ledge Type Order: Left Ledge, Reg Ledge, Reg Ledge Pole, Right Ledge, Both Ledge
@@ -40,6 +49,8 @@ pygame.transform.scale(tileset.subsurface((87,24,10,7)), (imgScale*10, imgScale*
 # Initalize Surface
 displaysurface = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Game")
+
+
 
 class Player(pygame.sprite.Sprite):
     def __init__(self):
@@ -140,9 +151,15 @@ while True:
 
     
 
-            
+    
      
-    displaysurface.fill((0,0,0))
+    displaysurface.fill(black)
+
+    # Blit Background
+    pygame.draw.rect(displaysurface, darkPurple, (0,0,WIDTH,75), 0)
+    for i in range(0,4,1):
+        displaysurface.blit(background, (i*bgScale*64, 75))
+        
     for entity in all_sprites:
         displaysurface.blit(entity.surf, entity.rect)
  
