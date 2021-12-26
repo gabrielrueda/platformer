@@ -123,9 +123,6 @@ def main():
                     speed =5
                 if event.key == pygame.K_LEFT:
                     speed = -5
-                if event.key == pygame.K_SPACE and pos >= 230:
-                    start_ticks=pygame.time.get_ticks()
-                    jump = True
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_RIGHT:
                     speed = 0
@@ -137,20 +134,7 @@ def main():
 
         bgAndWalkways()
         pos = g*(seconds*seconds) -200*seconds +230
-        test = overPlatform(x+25,pos)
-        before = 0
-        
-        if test == 2:
-            if(before == 0):
-                start_ticks=pygame.time.get_ticks()
-                before = 2
-            game_window.blit(skeleton, (x, int(pos)))
-        elif test == 1 or jump == True :
-             game_window.blit(skeleton, (x, int(pos)))
-             jump = False
-        else:
-            before = 0
-            game_window.blit(skeleton, (x, 231))
+        game_window.blit(skeleton, (x, pos))
             
             
         print(seconds)
