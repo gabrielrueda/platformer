@@ -6,7 +6,6 @@ import time
 import os
 
 
-
 frameRate = 60
 windowSize = [1200,600]
 scale = 8
