@@ -52,10 +52,10 @@ for i in range(0,6):
 
 
 # Ledge Type Order: Left Ledge, Reg Ledge, Reg Ledge Pole, Right Ledge, Both Ledge
-ledgeTypes = [pygame.transform.scale(tileset.subsurface((72,24,7,7)), (imgScale*7, imgScale*7)), 
-pygame.transform.scale(tileset.subsurface((80,24,7,7)), (imgScale*7, imgScale*7)), 
-pygame.transform.scale(tileset.subsurface((87,24,10,7)), (imgScale*10, imgScale*7)),
-pygame.transform.scale(tileset.subsurface((97,24,7,7)), (imgScale*7, imgScale*7)),
+ledgeTypes = [pygame.transform.scale(tileset.subsurface((72,24,8,8)), (imgScale*8, imgScale*8)), 
+pygame.transform.scale(tileset.subsurface((80,24,8,8)), (imgScale*8, imgScale*8)), 
+pygame.transform.scale(tileset.subsurface((88,24,8,8)), (imgScale*8, imgScale*8)),
+pygame.transform.scale(tileset.subsurface((96,24,8,8)), (imgScale*8, imgScale*8)),
 pygame.transform.scale(tileset.subsurface((96,32,8,8)), (imgScale*8, imgScale*8)),  # Both Ledge (4)
 pygame.transform.scale(tileset.subsurface((8,8,8,8)), (imgScale*8, imgScale*8)),  #grass_TL (5)
 pygame.transform.scale(tileset.subsurface((16,8,8,8)), (imgScale*8, imgScale*8)),  # grass_TC (6)
@@ -66,12 +66,11 @@ pygame.transform.scale(tileset.subsurface((24,16,8,8)), (imgScale*8, imgScale*8)
 pygame.transform.scale(tileset.subsurface((8,24,8,8)), (imgScale*8, imgScale*8)),   #grass_BL (11)
 pygame.transform.scale(tileset.subsurface((16,24,8,8)), (imgScale*8, imgScale*8)),    #grass_BC (12)
 pygame.transform.scale(tileset.subsurface((24,24,8,8)), (imgScale*8, imgScale*8)),    #grass_BR (13)
-pygame.transform.scale(tileset.subsurface((87,24,10,7)), (imgScale*10, imgScale*7)),    
-pygame.transform.scale(tileset.subsurface((87,24,10,7)), (imgScale*10, imgScale*7)),    
-pygame.transform.scale(tileset.subsurface((87,24,10,7)), (imgScale*10, imgScale*7)),    
-pygame.transform.scale(tileset.subsurface((87,24,10,7)), (imgScale*10, imgScale*7)),    
-pygame.transform.scale(tileset.subsurface((87,24,10,7)), (imgScale*10, imgScale*7)),    
-pygame.transform.scale(tileset.subsurface((87,24,10,7)), (imgScale*10, imgScale*7)),    
+pygame.transform.scale(tileset.subsurface((8,32,8,8)), (imgScale*8, imgScale*8)),    #Corner_BR (14)
+pygame.transform.scale(tileset.subsurface((16,32,8,8)), (imgScale*8, imgScale*8)),    #Corner_BL (15)
+pygame.transform.scale(tileset.subsurface((8,40,8,8)), (imgScale*8, imgScale*8)),    #Corner TR  (16)
+pygame.transform.scale(tileset.subsurface((16,40,8,8)), (imgScale*8, imgScale*8)),   #Corner_TL  (17)
+   
 ]
 
 itemArray = [
@@ -190,9 +189,9 @@ class ProgressBar(pygame.sprite.Sprite):
         self.rect.center = 1050,50
 
 class platform(pygame.sprite.Sprite):
-    def __init__(self,img,pos,size):
+    def __init__(self,img,pos):
         super().__init__()
-        size = vec(size.x*imgScale, size.y*imgScale)
+        size = vec(8*imgScale, 8*imgScale)
         self.image = ledgeTypes[img]
         self.id = img
         self.rect = self.image.get_rect()
@@ -247,9 +246,9 @@ for line in contents:
         itemGroup.add(it1)
         all_sprites.add(it1)
     else:
-        for i in range(0,5):
+        for i in range(0,3):
             plat[i] = (int)(plat[i])
-        PT1 = platform(plat[0], vec(plat[1],plat[2]), vec(plat[3],plat[4]))
+        PT1 = platform(plat[0], vec(plat[1],plat[2]))
         platforms.add(PT1)
         all_sprites.add(PT1)
 
