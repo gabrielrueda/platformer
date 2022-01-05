@@ -2,11 +2,13 @@ import pygame
 from pygame.locals import *
 import os
 import math
+import spriteData
 
 # NOTE: The level data file format is...
 #       ledgeType, pos x, pos y, size x, size y
  
 pygame.init()
+pygame.font.init() 
 vec = pygame.math.Vector2  # 2 for two dimensional
 
 #Colours
@@ -34,6 +36,11 @@ FramePerSec = pygame.time.Clock()
 
 itemsToGet = [0,0]
 
+#Font Variables
+# font = pygame.font.Font(os.path.dirname(os.getcwd()) + '/platformer/Assets/arial.ttf', 16)
+font = pygame.font.SysFont('Comic Sans MS', 30)
+
+
 # Sprite Sheets
 skelSheet = pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/skeleton.png')
 tileset = pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/tileset.png')
@@ -51,36 +58,12 @@ for i in range(0,6):
 
 
 
-# Ledge Type Order: Left Ledge, Reg Ledge, Reg Ledge Pole, Right Ledge, Both Ledge
-ledgeTypes = [pygame.transform.scale(tileset.subsurface((72,24,8,8)), (imgScale*8, imgScale*8)), 
-pygame.transform.scale(tileset.subsurface((80,24,8,8)), (imgScale*8, imgScale*8)), 
-pygame.transform.scale(tileset.subsurface((88,24,8,8)), (imgScale*8, imgScale*8)),
-pygame.transform.scale(tileset.subsurface((96,24,8,8)), (imgScale*8, imgScale*8)),
-pygame.transform.scale(tileset.subsurface((96,32,8,8)), (imgScale*8, imgScale*8)),  # Both Ledge (4)
-pygame.transform.scale(tileset.subsurface((8,8,8,8)), (imgScale*8, imgScale*8)),  #grass_TL (5)
-pygame.transform.scale(tileset.subsurface((16,8,8,8)), (imgScale*8, imgScale*8)),  # grass_TC (6)
-pygame.transform.scale(tileset.subsurface((24,8,8,8)), (imgScale*8, imgScale*8)),  #grass_TR (7)
-pygame.transform.scale(tileset.subsurface((8,16,8,8)), (imgScale*8, imgScale*8)),  #grass_ML (8)
-pygame.transform.scale(tileset.subsurface((16,16,8,8)), (imgScale*8, imgScale*8)),   #grass_MC (9)
-pygame.transform.scale(tileset.subsurface((24,16,8,8)), (imgScale*8, imgScale*8)),   #grass_MR (10)
-pygame.transform.scale(tileset.subsurface((8,24,8,8)), (imgScale*8, imgScale*8)),   #grass_BL (11)
-pygame.transform.scale(tileset.subsurface((16,24,8,8)), (imgScale*8, imgScale*8)),    #grass_BC (12)
-pygame.transform.scale(tileset.subsurface((24,24,8,8)), (imgScale*8, imgScale*8)),    #grass_BR (13)
-pygame.transform.scale(tileset.subsurface((8,32,8,8)), (imgScale*8, imgScale*8)),    #Corner_BR (14)
-pygame.transform.scale(tileset.subsurface((16,32,8,8)), (imgScale*8, imgScale*8)),    #Corner_BL (15)
-pygame.transform.scale(tileset.subsurface((8,40,8,8)), (imgScale*8, imgScale*8)),    #Corner TR  (16)
-pygame.transform.scale(tileset.subsurface((16,40,8,8)), (imgScale*8, imgScale*8)),   #Corner_TL  (17)
-   
-]
 
 itemArray = [
     pygame.transform.scale(items.subsurface((16,16,16,16)), (itemScale*16, itemScale*16)),
     pygame.transform.scale(items.subsurface((32,16,16,16)), (itemScale*16, itemScale*16)), 
 ]
 
-rightLedge = tileset.subsurface((97,24,7,7))
-
-bothLedge = tileset.subsurface((96,32,8,8))
 
 # Initalize Surface
 displaysurface = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -91,9 +74,6 @@ pygame.display.set_caption("Game")
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__() 
-        # self.surf = pygame.Surface((imgScale*10, imgScale*14))
-        # self.surf.blit(skeleton, (0,0))
-        # self.rect = self.surf.get_rect(center = (10, 420))
         self.image = skeletonWalking[0]
         self.rect = self.image.get_rect()
         self.rect.center = ((10,420))
@@ -111,7 +91,7 @@ class Player(pygame.sprite.Sprite):
             self.vel.y = -8
             self.health -= 0.07
 
-    def update(self,newACC,jump):
+    def update(self,newACC,shiftPress):
         # print("Health: ", self.health)
         self.health -= 0.01
         time = pygame.time.get_ticks()
@@ -146,16 +126,22 @@ class Player(pygame.sprite.Sprite):
             if i.id == 8 and self.vel.x > 0:
                 self.pos.x = i.rect.left - 24;
             elif i.id == 10 and self.vel.x < 0:
-                self.pos.x = i.rect.right +24;
-            elif (i.id == 7 or i.id == 13) and self.vel.x < 0 and self.pos.x > i.rect.right:
                 self.pos.x = i.rect.right +24
-            elif (i.id == 5 or i.id == 11) and self.vel.x > 0 and self.pos.x < i.rect.left:
+            elif i.id == 12 and self.vel.y < 0:
+                self.pos.y = i.rect.bottom + 62
+                self.vel.y = -self.vel.y/2
+            elif (i.id == 11 or i.id ==13) and self.pos.y+60 <= i.rect.bottom:
+                self.pos.y = i.rect.bottom + 62
+                self.vel.y = -self.vel.y/2
+            elif (i.id == 7 or i.id == 13) and self.vel.x < 0 and self.pos.x >= i.rect.right and self.pos.y-2 >= i.rect.top:
+                self.pos.x = i.rect.right +24
+            elif (i.id == 5 or i.id == 11) and self.vel.x > 0 and self.pos.x <= i.rect.left and self.pos.y-2 >= i.rect.top:
                 self.pos.x = i.rect.left -24
-            elif self.vel.y > 0:
-                print(math.floor(self.vel.y)/20)
+            elif self.vel.y > 0 and ((i.id >= 5 and i.id <= 7) or i.id <=4):
                 self.health -= math.floor(self.vel.y)/20
                 self.pos.y = i.rect.top + 1;
                 self.vel.y = 0
+
 
         # Check item collision 
         collect = pygame.sprite.spritecollide(self, itemGroup, False)
@@ -163,21 +149,21 @@ class Player(pygame.sprite.Sprite):
             if self.inventory == None:
                 self.inventory = it
             else:
-                self.inventory.transform()
+                self.inventory.transform(self)
                 
         if self.rect.colliderect(theChest.rect):
-                    if(self.rect.left > theChest.rect.left):
-                        self.pos.x = theChest.rect.right+24
-                    else:
-                        self.pos.x = theChest.rect.left-24
-                    if self.inventory != None:
-                        itemsToGet[self.inventory.id] -= 1
-                        itemGroup.remove(self.inventory)
-                        all_sprites.remove(self.inventory)
-                        self.inventory = None
+            if(self.rect.left > theChest.rect.left and self.vel.x < 0):
+                self.pos.x = theChest.rect.right+24
+            elif(self.rect.right < theChest.rect.right and self.vel.x > 0):
+                self.pos.x = theChest.rect.left-24
+            if self.inventory != None:
+                itemsToGet[self.inventory.id] -= 1
+                itemGroup.remove(self.inventory)
+                all_sprites.remove(self.inventory)
+                self.inventory = None
                         
 
-        print(itemsToGet)
+        # print(itemsToGet)
         # Update Position
         self.rect.midbottom = self.pos 
 
@@ -188,69 +174,40 @@ class ProgressBar(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = 1050,50
 
-class platform(pygame.sprite.Sprite):
-    def __init__(self,img,pos):
-        super().__init__()
-        size = vec(8*imgScale, 8*imgScale)
-        self.image = ledgeTypes[img]
-        self.id = img
-        self.rect = self.image.get_rect()
-        self.rect.center = (pos.x + (size.x/2), pos.y + (size.y/2))
 
-class chest(pygame.sprite.Sprite):
-    def __init__(self):
+class itemIndicator(pygame.sprite.Sprite):
+    def __init__(self,img,num):
         super().__init__()
-        self.image = pygame.transform.scale(pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/chest.png'), (60,64))
+        self.image = pygame.transform.scale(itemArray[img],(itemScale*11, itemScale*11))
         self.rect = self.image.get_rect()
-        self.rect.center = (40,280)
-
-class anItem(pygame.sprite.Sprite):
-    def __init__(self, img, pos):
-        super().__init__()
-        self.id = img
-        self.image = itemArray[img]
-        self.rect = self.image.get_rect()
-        self.rect.center = (pos.x + 8, pos.y + 8)
-    
-    def transform(self):
-        self.image = pygame.transform.scale(self.image, (itemScale*8, itemScale*8))
-        self.rect.center = (P1.rect.left + 40, P1.rect.top+55)
         
+        self.rect.center = (50+(num*100),30)
 
 # Make Sprite Groups
 P1 = Player()
 
-platforms = pygame.sprite.Group()
-itemGroup = pygame.sprite.Group()
+platforms = spriteData.getPlatforms()
+itemGroup = spriteData.getItems()
 
 healthBar = ProgressBar()
-theChest = chest()
+theChest = spriteData.getChestSprite()
 
 all_sprites = pygame.sprite.Group()
 # all_sprites.add(PT1)
 all_sprites.add(P1)
 all_sprites.add(theChest)
 all_sprites.add(healthBar)
-# all_sprites.add(PT2)
+all_sprites.add(platforms)
+all_sprites.add(itemGroup)
 
-# Platform & Item Formation
-file = open(os.getcwd() + '/Data/lvl1.txt', 'r')
-contents = file.readlines()
-for line in contents:
-    plat = line.split(',')
-    if plat[0] == 'i':
-        for i in range(1,4):
-            plat[i] = (int)(plat[i])
-        it1 = anItem(plat[1], vec (plat[2], plat[3]))
-        itemsToGet[plat[1]] += 1
-        itemGroup.add(it1)
-        all_sprites.add(it1)
-    else:
-        for i in range(0,3):
-            plat[i] = (int)(plat[i])
-        PT1 = platform(plat[0], vec(plat[1],plat[2]))
-        platforms.add(PT1)
-        all_sprites.add(PT1)
+
+# Item Indicator Formation: 
+i = 0
+for j in range(0,len(itemsToGet)):
+    if itemsToGet[j] != 0:
+        all_sprites.add(itemIndicator(j,i))
+        i += 1
+
 
 while True:
     accel = vec(0,0.5)
@@ -283,11 +240,9 @@ while True:
     # print(pygame.time.get_ticks())
     P1.update(accel,jump)
 
-    
-
-    
-     
     displaysurface.fill(black)
+
+
 
     # Blit Background
     pygame.draw.rect(displaysurface, darkPurple, (0,0,WIDTH,75), 0)
@@ -298,6 +253,7 @@ while True:
     pygame.draw.rect(displaysurface, red, (healthBar.rect.left+60, healthBar.rect.top+25,157*(P1.health/100),15))
         
     all_sprites.draw(displaysurface)
+
  
     pygame.display.update()
     FramePerSec.tick(FPS)
