@@ -2,9 +2,10 @@ import pygame
 from pygame.locals import *
 import os
 import math
+import playerData
 
-platforms = pygame.sprite.Group()
-itemGroup = pygame.sprite.Group()
+
+
 
 itemsToGet = [0,0]
 
@@ -75,8 +76,31 @@ class anItem(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(self.image, (itemScale*8, itemScale*8))
         self.rect.center = (P1.rect.left + 40, P1.rect.top+55)
 
-def getChestSprite():
-    return chest()
+class ProgressBar(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = pygame.transform.scale(pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/ProgressBar.png'), (225, 47))
+        self.rect = self.image.get_rect()
+        self.rect.center = 1050,50
+
+
+class itemIndicator(pygame.sprite.Sprite):
+    def __init__(self,img,num,amount):
+        super().__init__()
+        self.image = pygame.transform.scale(itemArray[img],(itemScale*11, itemScale*11))
+        self.rect = self.image.get_rect()
+        self.amount = amount
+        
+        self.rect.center = (50+(num*100),30)
+
+
+platforms = pygame.sprite.Group()
+itemGroup = pygame.sprite.Group()
+chestSprite = chest()
+healthBar = ProgressBar()
+all_sprites = pygame.sprite.Group()
+playerSprite = playerData.getPlayer()
+indicatorGroup = pygame.sprite.Group()
 
 def processPlatformsItems():
     file = open(os.getcwd() + '/Data/lvl1.txt', 'r')
@@ -95,9 +119,20 @@ def processPlatformsItems():
             PT1 = platform(plat[0], vec(plat[1],plat[2]))
             platforms.add(PT1)
 
-def getPlatforms():
-    processPlatformsItems()
-    return platforms
 
-def getItems():
-    return itemGroup
+
+#SpriteList
+def initSprites():
+    processPlatformsItems()
+    # Item Indicator Formation: 
+    i = 0
+    for j in range(0,len(itemsToGet)):
+        if itemsToGet[j] != 0:
+            indicatorGroup.add(itemIndicator(j,i,itemsToGet[j]))
+            i += 1
+    all_sprites.add(indicatorGroup)
+    all_sprites.add(playerSprite)
+    all_sprites.add(chestSprite)
+    all_sprites.add(healthBar)
+    all_sprites.add(platforms)
+    all_sprites.add(itemGroup)
