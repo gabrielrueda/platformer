@@ -20,8 +20,8 @@ blue = pygame.Color(0, 0, 255)
 # empty = pygame.Color(255,255,255,0)
 
 # Global Constants
-HEIGHT = 600
-WIDTH = 1200
+HEIGHT = 608
+WIDTH = 1216
 ACC = 0.4
 FRIC = -0.2
 FPS = 60
@@ -50,6 +50,7 @@ items = pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/ite
 skeleton = pygame.transform.scale(skelSheet.subsurface((4,25,11,14)), (imgScale*10, imgScale*14))
 regLedge = pygame.transform.scale(tileset.subsurface((80,24,7,7)), (imgScale*7, imgScale*7))
 background = pygame.transform.scale(tileset.subsurface((112,33,64,31)), (64*bgScale,31*bgScale))
+bg2 = pygame.transform.scale(pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/bg.png'),(WIDTH,HEIGHT))
 
 
 
@@ -67,7 +68,7 @@ spriteData.initSprites()
 def addText():
     i = 0
     for it in spriteData.indicatorGroup:
-        txt = font.render((str(spriteData.itemsToGet[i])+ "/" + str(it.amount)),False,green)
+        txt = font.render((str(spriteData.itemsToGet[it.imgNum])+ "/" + str(it.amount)),False,green)
         displaysurface.blit(txt, (it.rect.left+40,it.rect.top+4))
         i += 1
 
@@ -105,6 +106,8 @@ while True:
 
     displaysurface.fill(black)
 
+    for human in spriteData.humanSprite:
+        human.update()
 
 
     # Blit Background
@@ -112,9 +115,18 @@ while True:
     for i in range(0,4,1):
         displaysurface.blit(background, (i*bgScale*64, 75))
 
+    
+    displaysurface.blit(bg2, (0, 0))
+
     #Draw Health Bar
     pygame.draw.rect(displaysurface, red, (spriteData.healthBar.rect.left+60, spriteData.healthBar.rect.top+25,157*(spriteData.playerSprite.health/100),15))
-        
+    
+
+
+    # pygame.draw.lines(displaysurface,red, True, [(50,100), (100,50), (150,100)])
+    for spear in spriteData.spearGroup:
+        spear.update()
+    
     spriteData.all_sprites.draw(displaysurface)
 
     addText()

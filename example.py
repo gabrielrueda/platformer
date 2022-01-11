@@ -1,5 +1,14 @@
-n = 12
+import os 
 
-while n <= 1200:
-    n += 32
-    print(str(n))
+platforms = []
+
+file = open('data.csv', 'r')
+content = file.readlines()
+for line in content:
+    row = line.split(',')
+    for tile in row:
+        tile = (int)(row[0])
+        if tile != -1:
+            print("Yes")
+        else:
+            print("No")
