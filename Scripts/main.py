@@ -72,10 +72,10 @@ def addText():
         displaysurface.blit(txt, (it.rect.left+40,it.rect.top+4))
         i += 1
 
+count = 0
 
 while True:
     accel = vec(0,0.5)
-    jump = False
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -88,21 +88,25 @@ while True:
                 moveLeft = True
                 moveRight = False
             if event.key == pygame.K_SPACE:
-                jump == True
                 spriteData.playerSprite.jump()
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_RIGHT or event.key == pygame.K_LEFT:
                 moveRight = False
                 moveLeft = False
 
+    count += 1
     
     if moveRight == True:
         accel.x = ACC
     elif moveLeft == True:
         accel.x = -ACC
+
+    # print(count)
+    if count %5 == 0:
+        spriteData.playerSprite.animate(moveLeft, moveRight)
     
     # print(pygame.time.get_ticks())
-    spriteData.playerSprite.update(accel,jump)
+    spriteData.playerSprite.update(accel)
 
     displaysurface.fill(black)
 
