@@ -152,7 +152,10 @@ class spear(pygame.sprite.Sprite):
     def __init__(self,pos,dir):
         super().__init__()
         self.pos = vec(pos[0], pos[1]-20)
-        self.image = pygame.transform.rotate(pygame.transform.scale(items.subsurface((32,128,16,16)), (itemScale*8, itemScale*8)),-45) 
+        if dir > 0:
+            self.image = pygame.transform.rotate(pygame.transform.scale(items.subsurface((32,128,16,16)), (itemScale*8, itemScale*8)),-45)
+        else:
+            self.image = pygame.transform.rotate(pygame.transform.scale(items.subsurface((32,128,16,16)), (itemScale*8, itemScale*8)),135)
         self.rect = self.image.get_rect()
         self.rect.center = pos
         self.vel = vec(10*dir,0)

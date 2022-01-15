@@ -49,7 +49,7 @@ class Player(pygame.sprite.Sprite):
 
     def jump(self):
         if self.jumpAllowed:
-            self.vel.y = -12
+            self.vel.y = -10
             self.health -= 0.07
     
     def removeHealth(self,amount):
@@ -90,13 +90,14 @@ class Player(pygame.sprite.Sprite):
         # Check Collisions
         hits = pygame.sprite.spritecollide(self, spriteData.platforms, False)
         if hits:
+            # print(hits[0].id)
             self.jumpAllowed = True
             for i in hits:
                 # Left Collisions
-                if (i.id == 24 or i.id == 47 or i.id == 70) and self.pos.x+21 <= i.rect.left and self.vel.x > 0:
+                if (i.id == 24 or i.id == 47 or i.id == 70) and self.pos.x+21 <= i.rect.left and self.vel.x > 0 and self.pos.y != i.rect.top+1:
                     self.pos.x = i.rect.left -24
                 # Right Collisions
-                elif (i.id == 26 or i.id == 49 or i.id == 72) and self.pos.x-21 >= i.rect.right and self.vel.x < 0:
+                elif (i.id == 26 or i.id == 49 or i.id == 72) and self.pos.x-21 >= i.rect.right and self.vel.x < 0 and self.pos.y != i.rect.top+1.75:
                     self.pos.x = i.rect.right +24
                 # Bottom Collisions
                 elif (i.id <= 72 and i.id >= 70) and self.vel.y < 0:
@@ -104,15 +105,17 @@ class Player(pygame.sprite.Sprite):
                     self.vel.y = -self.vel.y/2
                 #Top Collisions
                 elif ((i.id <= 26 and i.id >= 24) or i.id >= 78) and self.vel.y > 0:
-                    self.pos.y = i.rect.top + 1
+                    self.pos.y = i.rect.top+1
                     self.vel.y = 0
                     self.health -= math.floor(self.vel.y)/20
+                print("Player Y:" + str(self.pos.y) + ", Plat Y: " + str(i.rect.top))      
         else:
             self.jumpAllowed = False
+
+        
         
            
 
-            # print("Player Y:" + str(self.pos.y) + ", Plat Y: " + str(i.rect.top))
         # Check item collision 
             # print(self.pos.y <= i.rect.top+16)
 
@@ -152,36 +155,23 @@ class human(pygame.sprite.Sprite):
         self.vel = vec(1,0)
         self.index = 0
 
-    def animate(self,left):
+    def animate(self):
         if(self.index < len(walkingPattern)-1):
             self.index += 1
         else:
+            spriteData.createSpear(self.pos.x, self.pos.y,self.vel.x)
             self.index = 0
-        
-        if self.vel.y == 0:
-            if left:
-                self.image = pygame.transform.flip(personWalking[walkingPattern[self.index]], True, False)
-            else:
-                self.image = personWalking[walkingPattern[self.index]]
 
     def update(self):
         time = pygame.time.get_ticks()
         if(self.vel.x > 0):
-            self.animate(False)
+            self.image = personWalking[walkingPattern[self.index]]
             if(self.pos.x >= self.max):
                 self.vel.x = -self.vel.x
         else:
-            self.animate(True)
-            # self.image = pygame.transform.flip(personWalking[self.index], True, False)
+            self.image = pygame.transform.flip(personWalking[walkingPattern[self.index]], True, False)
             if(self.pos.x <= self.min):
                 self.vel.x = -self.vel.x
-        
-        if(time % 7 == 0):
-            if(self.index == 5):
-                # self.index = 0
-                spriteData.createSpear(self.pos.x, self.pos.y,self.vel.x)
-            # else:
-                # self.index += 1
         
         
         # print("Position: " + str(self.pos.x))

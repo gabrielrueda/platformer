@@ -3,6 +3,7 @@ from pygame.locals import *
 import os
 import math
 import spriteData
+import startMenu
 
 # NOTE: The level data file format is...
 #       ledgeType, pos x, pos y, size x, size y
@@ -63,6 +64,13 @@ itemArray = [
 # Initalize Surface
 displaysurface = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Game")
+
+while startMenu.update(displaysurface,FramePerSec,FPS) == False:
+    pass
+
+
+
+
 spriteData.initSprites()
 
 def addText():
@@ -104,6 +112,8 @@ while True:
     # print(count)
     if count %5 == 0:
         spriteData.playerSprite.animate(moveLeft, moveRight)
+        for i in spriteData.humanSprite:
+            i.animate()
     
     # print(pygame.time.get_ticks())
     spriteData.playerSprite.update(accel)
