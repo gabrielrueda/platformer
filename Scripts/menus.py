@@ -8,6 +8,8 @@ bg = pygame.transform.scale(pygame.image.load(os.path.dirname(os.getcwd()) + '/p
 button = pygame.transform.scale(pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/startUnchecked.png'), (315,72))
 button2 = pygame.transform.scale(pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/startChecked.png'), (315,72))
 
+gameover = pygame.transform.scale(pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/gameover.png'), (700,90))
+
 buttonPos = [623,465]
 
 def update(displaysurface,FramePerSec,FPS):
@@ -35,4 +37,25 @@ def update(displaysurface,FramePerSec,FPS):
     pygame.display.update()
     FramePerSec.tick(FPS)
     return toGame
+
+def endMenu(displaysurface, FramePerSec, FPS):
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            quit()
+    
+    displaysurface.blit(gameover, (200,200))
+    pygame.display.update()
+    FramePerSec.tick(FPS)
+
+def storyInstructions(displaysurface, font,FramePerSec, FPS):
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            quit()
+    
+    
+    pygame.display.update()
+    FramePerSec.tick(FPS)
+
     

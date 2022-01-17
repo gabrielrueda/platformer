@@ -19,6 +19,8 @@ itemScale = 3
 
 
 walkingPattern = [0,1,0,2]
+idlePattern = [0,0,2,2]
+
 
 
 skeletonWalking = []
@@ -55,17 +57,19 @@ class Player(pygame.sprite.Sprite):
     def removeHealth(self,amount):
         self.health -= amount
     
-    def animate(self,left,right):
+    def animate(self,type):
         if(self.index < len(walkingPattern)-1):
             self.index += 1
         else:
             self.index = 0
         
         if self.vel.y == 0:
-            if left:
+            if type == 0:
                 self.image = pygame.transform.flip(skeletonWalking[walkingPattern[self.index]], True, False)
-            elif right:
+            elif type == 2:
                 self.image = skeletonWalking[walkingPattern[self.index]]
+            else:
+                self.image = skeletonWalking[idlePattern[self.index]]
 
     def update(self,newACC):
         # print("Health: ", self.health)

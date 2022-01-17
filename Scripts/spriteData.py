@@ -74,9 +74,11 @@ class itemIndicator(pygame.sprite.Sprite):
         super().__init__()
         self.image = pygame.transform.scale(itemArray[img],(itemScale*11, itemScale*11))
         self.rect = self.image.get_rect()
+        pixel = pygame.PixelArray(self.image)
         self.amount = amount
         self.imgNum = img
         self.rect.center = (50+(num*100),30)
+        self.color = self.image.unmap_rgb(pixel[(22,22)])
 
 
 platforms = pygame.sprite.Group()

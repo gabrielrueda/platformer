@@ -3,7 +3,7 @@ from pygame.locals import *
 import os
 import math
 import spriteData
-import startMenu
+import menus
 
 # NOTE: The level data file format is...
 #       ledgeType, pos x, pos y, size x, size y
@@ -16,16 +16,17 @@ vec = pygame.math.Vector2  # 2 for two dimensional
 black = pygame.Color(0, 0, 0)
 darkPurple = pygame.Color(19,12,55)
 red = pygame.Color(254, 0, 3)
-green = pygame.Color(0, 255, 0)
+green = pygame.Color(148, 255, 194)
 blue = pygame.Color(0, 0, 255)
 # empty = pygame.Color(255,255,255,0)
 
 # Global Constants
 HEIGHT = 608
 WIDTH = 1216
-ACC = 0.4
 FRIC = -0.2
 FPS = 60
+ACC = 0.4
+
 
 # Global Variables
 moveRight = False
@@ -35,11 +36,10 @@ itemScale = 3
 bgScale = 8
 FramePerSec = pygame.time.Clock()
 
-itemsToGet = [0,0]
 
 #Font Variables
-# font = pygame.font.Font(os.path.dirname(os.getcwd()) + '/platformer/Assets/arial.ttf', 16)
-font = pygame.font.SysFont('Comic Sans MS', 20)
+font = pygame.font.Font(os.path.dirname(os.getcwd()) + '/platformer/Assets/font2.TTF', 16)
+# font = pygame.font.SysFont('Comic Sans MS', 20)
 
 
 # Sprite Sheets
@@ -65,7 +65,7 @@ itemArray = [
 displaysurface = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Game")
 
-while startMenu.update(displaysurface,FramePerSec,FPS) == False:
+while menus.update(displaysurface,FramePerSec,FPS) == False:
     pass
 
 
@@ -76,7 +76,7 @@ spriteData.initSprites()
 def addText():
     i = 0
     for it in spriteData.indicatorGroup:
-        txt = font.render((str(spriteData.itemsToGet[it.imgNum])+ "/" + str(it.amount)),False,green)
+        txt = font.render((str(spriteData.itemsToGet[it.imgNum])+ "/" + str(it.amount)),False, it.color)
         displaysurface.blit(txt, (it.rect.left+40,it.rect.top+4))
         i += 1
 
@@ -95,25 +95,43 @@ while True:
             if event.key == pygame.K_LEFT:
                 moveLeft = True
                 moveRight = False
-            if event.key == pygame.K_SPACE:
+            if event.key == pygame.K_x:
                 spriteData.playerSprite.jump()
+            if event.key == pygame.K_c:
+                # spriteData.playerSprite.removeHealth(2)
+                # ACC = 0.7
+                pass
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_RIGHT or event.key == pygame.K_LEFT:
                 moveRight = False
                 moveLeft = False
+            if event.key == pygame.K_c:
+                # ACC = 0.4
+                pass
+            
 
     count += 1
     
     if moveRight == True:
         accel.x = ACC
+        if count %5 == 0:
+            spriteData.playerSprite.animate(2)
+            for i in spriteData.humanSprite:
+                i.animate()
     elif moveLeft == True:
         accel.x = -ACC
+        if count %5 == 0:
+            spriteData.playerSprite.animate(0)
+            for i in spriteData.humanSprite:
+                i.animate()
+    else:
+         if count %10 == 0:
+            spriteData.playerSprite.animate(1)
+            for i in spriteData.humanSprite:
+                i.animate()
 
     # print(count)
-    if count %5 == 0:
-        spriteData.playerSprite.animate(moveLeft, moveRight)
-        for i in spriteData.humanSprite:
-            i.animate()
+    
     
     # print(pygame.time.get_ticks())
     spriteData.playerSprite.update(accel)
@@ -144,6 +162,16 @@ while True:
     spriteData.all_sprites.draw(displaysurface)
 
     addText()
- 
+
     pygame.display.update()
+
+    if spriteData.playerSprite.health <= 0:
+        break
+
+    if spriteData.itemsToGet.count(0) == len(spriteData.itemsToGet):
+        break
+
     FramePerSec.tick(FPS)
+
+while True:
+   menus.endMenu(displaysurface, FramePerSec, FPS)
