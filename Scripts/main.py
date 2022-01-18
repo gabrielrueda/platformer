@@ -98,16 +98,14 @@ while True:
             if event.key == pygame.K_x:
                 spriteData.playerSprite.jump()
             if event.key == pygame.K_c:
-                # spriteData.playerSprite.removeHealth(2)
-                # ACC = 0.7
-                pass
+                spriteData.playerSprite.removeHealth(2)
+                ACC = 0.7
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_RIGHT or event.key == pygame.K_LEFT:
                 moveRight = False
                 moveLeft = False
             if event.key == pygame.K_c:
-                # ACC = 0.4
-                pass
+                ACC = 0.4
             
 
     count += 1

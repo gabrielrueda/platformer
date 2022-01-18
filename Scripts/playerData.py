@@ -39,10 +39,10 @@ class Player(pygame.sprite.Sprite):
         super().__init__() 
         self.image = skeletonWalking[0]
         self.rect = self.image.get_rect()
-        self.rect.center = ((10,200))
+        self.rect.center = ((210,150))
         self.health = 100
 
-        self.pos = vec((210, 180))
+        self.pos = vec((180, 100))
         self.vel = vec(0,0)
         self.acc = vec(0,0)
         self.index = 0
@@ -82,42 +82,71 @@ class Player(pygame.sprite.Sprite):
         if fireCollion:
             self.health -= 0.5
 
-        self.acc.x += self.vel.x * FRIC
-        self.vel += self.acc
-        self.pos += self.vel + 0.5 * self.acc
+       
+        # self.pos += self.vel
          
         if self.pos.x > WIDTH:
             self.pos.x = 0
         if self.pos.x < 0:
             self.pos.x = WIDTH
 
-        # Check Collisions
-        hits = pygame.sprite.spritecollide(self, spriteData.platforms, False)
-        if hits:
-            # print(hits[0].id)
-            self.jumpAllowed = True
-            for i in hits:
-                # Left Collisions
-                if (i.id == 24 or i.id == 47 or i.id == 70) and self.pos.x+21 <= i.rect.left and self.vel.x > 0 and self.pos.y != i.rect.top+1:
-                    self.pos.x = i.rect.left -24
-                # Right Collisions
-                elif (i.id == 26 or i.id == 49 or i.id == 72) and self.pos.x-21 >= i.rect.right and self.vel.x < 0 and self.pos.y != i.rect.top+1.75:
-                    self.pos.x = i.rect.right +24
-                # Bottom Collisions
-                elif (i.id <= 72 and i.id >= 70) and self.vel.y < 0:
-                    self.pos.y = i.rect.bottom + 62
-                    self.vel.y = -self.vel.y/2
-                #Top Collisions
-                elif ((i.id <= 26 and i.id >= 24) or i.id >= 78) and self.vel.y > 0:
-                    self.pos.y = i.rect.top+1
-                    self.vel.y = 0
-                    self.health -= math.floor(self.vel.y)/20
-                print("Player Y:" + str(self.pos.y) + ", Plat Y: " + str(i.rect.top))      
-        else:
-            self.jumpAllowed = False
+        # Old Collision Code
+        # hits = pygame.sprite.spritecollide(self, spriteData.platforms, False)
+        # if hits:
+        #     # print(hits[0].id)
+        #     self.jumpAllowed = True
+        #     for i in hits:
+        #         # Left Collisions
+        #         if (i.id == 24 or i.id == 47 or i.id == 70) and self.pos.x+21 <= i.rect.left and self.vel.x > 0 and self.pos.y != i.rect.top+1:
+        #             self.pos.x = i.rect.left -24
+        #         # Right Collisions
+        #         elif (i.id == 26 or i.id == 49 or i.id == 72) and self.pos.x-21 >= i.rect.right and self.vel.x < 0 and self.pos.y != i.rect.top+1.75:
+        #             self.pos.x = i.rect.right +24
+        #         # Bottom Collisions
+        #         elif (i.id <= 72 and i.id >= 70) and self.vel.y < 0:
+        #             self.pos.y = i.rect.bottom + 62
+        #             self.vel.y = -self.vel.y/2
+        #         #Top Collisions
+        #         elif ((i.id <= 26 and i.id >= 24) or i.id >= 78) and self.vel.y > 0:
+        #             self.pos.y = i.rect.top+1
+        #             self.vel.y = 0
+        #             self.health -= math.floor(self.vel.y)/20
+        #         print("Player Y:" + str(self.pos.y) + ", Plat Y: " + str(i.rect.top))      
+        # else:
+        #     self.jumpAllowed = False
 
-        
-        
+        self.acc.x += self.vel.x * FRIC
+        self.vel += self.acc
+        dx = self.vel.x + 0.5*self.acc.x
+        dy = self.vel.y + 0.5*self.acc.y
+
+
+        # New Collision Code
+        for tile in spriteData.platforms:
+            if tile.rect.colliderect(self.pos.x+dx,self.pos.y-1, 52,60):
+                dx = 0
+            if tile.rect.colliderect(self.pos.x,self.pos.y+dy, 52,60):
+                #check if below the ground, hitting head
+                if self.vel.y < 0:
+                    self.vel.y = 0
+                    dy = tile.rect.bottom - self.rect.top
+                #check if above ground falling
+                elif self.vel.y >= 0:
+                    self.vel.y = 0
+                    dy = tile.rect.top - self.rect.bottom
+
+
+        # Chest collision:
+        if spriteData.chestSprite.rect.colliderect(self.pos.x+dx,self.pos.y-1, 52,60):
+            dx = 0
+            if self.inventory != None:
+                spriteData.itemsToGet[self.inventory.id] -= 1
+                spriteData.itemGroup.remove(self.inventory)
+                spriteData.all_sprites.remove(self.inventory)
+                self.inventory = None
+
+        self.pos.x += dx
+        self.pos.y += dy
            
 
         # Check item collision 
@@ -130,22 +159,23 @@ class Player(pygame.sprite.Sprite):
             else:
                 self.inventory.transform(self)
         
-        theChest = spriteData.chestSprite.rect
-                
-        if self.rect.colliderect(theChest):
-            if(self.rect.left > theChest.left and self.vel.x < 0):
-                self.pos.x = theChest.right+24
-            elif(self.rect.right < theChest.right and self.vel.x > 0):
-                self.pos.x = theChest.left-24
-            if self.inventory != None:
-                spriteData.itemsToGet[self.inventory.id] -= 1
-                spriteData.itemGroup.remove(self.inventory)
-                spriteData.all_sprites.remove(self.inventory)
-                self.inventory = None
+
+        # Old Chest Collision    
+        # if self.rect.colliderect(theChest):
+        #     if(self.rect.left > theChest.left and self.vel.x < 0):
+        #         self.pos.x = theChest.right+24
+        #     elif(self.rect.right < theChest.right and self.vel.x > 0):
+        #         self.pos.x = theChest.left-24
+        #     if self.inventory != None:
+        #         spriteData.itemsToGet[self.inventory.id] -= 1
+        #         spriteData.itemGroup.remove(self.inventory)
+        #         spriteData.all_sprites.remove(self.inventory)
+        #         self.inventory = None
         
         
         # print("Player Y:" + str(self.pos.y))
-        self.rect.midbottom = self.pos 
+        # self.rect.midbottom = self.pos
+        self.rect.topleft = self.pos 
 
 class human(pygame.sprite.Sprite):
     def __init__(self,y,min,max):
