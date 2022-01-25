@@ -82,6 +82,7 @@ class itemIndicator(pygame.sprite.Sprite):
 
 
 platforms = pygame.sprite.Group()
+ladders = pygame.sprite.Group()
 itemGroup = pygame.sprite.Group()
 chestSprite = chest()
 healthBar = ProgressBar()
@@ -119,7 +120,10 @@ def proPlats():
         for tileStr in row:
             tile = (int)(tileStr)
             # for i in range(0, len(ledgeId)):
-            if(tile != -1):
+            if(tile == 101):
+                lad = platform(vec(x,y), tile)
+                ladders.add(lad)
+            elif(tile != -1):
                 PT1 = platform(vec(x,y), tile)
                 platforms.add(PT1)
             x += 32
@@ -143,12 +147,14 @@ def initSprites():
             indicatorGroup.add(itemIndicator(j,i,itemsToGet[j]))
             i += 1
     all_sprites.add(indicatorGroup)
+    all_sprites.add(ladders)
     all_sprites.add(playerSprite)
     all_sprites.add(chestSprite)
     all_sprites.add(healthBar)
     all_sprites.add(platforms)
     all_sprites.add(itemGroup)
     all_sprites.add(humanSprite)
+
 
 class spear(pygame.sprite.Sprite):
     def __init__(self,pos,dir):
