@@ -48,6 +48,7 @@ class Player(pygame.sprite.Sprite):
         self.index = 0
         self.inventory = None
         self.jumpAllowed = True
+        self.facing = True # True means right, false means left
 
     def jump(self):
         if self.jumpAllowed:
@@ -69,7 +70,11 @@ class Player(pygame.sprite.Sprite):
             elif type == 2:
                 self.image = skeletonWalking[walkingPattern[self.index]]
             else:
-                self.image = skeletonWalking[idlePattern[self.index]]
+                if self.facing:
+                    self.image = skeletonWalking[idlePattern[self.index]]
+                else:
+                    self.image = pygame.transform.flip(skeletonWalking[idlePattern[self.index]], True, False)
+                
 
     def update(self,newACC):
         # print("Health: ", self.health)
@@ -133,13 +138,18 @@ class Player(pygame.sprite.Sprite):
        
 
         # Check item collision 
-        collect = pygame.sprite.spritecollide(self, spriteData.itemGroup, False)
-        for it in collect:
-            if self.inventory == None:
-                self.inventory = it
-            else:
-                self.inventory.transform(self)
-        
+        if self.inventory == None:
+            collect = pygame.sprite.spritecollide(self, spriteData.itemGroup, False)
+            if collect:
+                self.inventory = collect[0]
+        else:
+            self.inventory.transform(self,self.acc)
+
+        if dx > 0:
+            self.facing = True
+        elif dx < 0:
+            self.facing = False
+
         # Update Position:
         self.pos.x += dx
         self.pos.y += dy

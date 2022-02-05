@@ -3,7 +3,7 @@ from pygame.locals import *
 import os
 import math
 import playerData
-
+import random
 
 
 
@@ -13,6 +13,8 @@ vec = pygame.math.Vector2  # 2 for two dimensional
 
 imgScale = 4
 itemScale = 3
+FRIC = -0.2
+
 
 # Sprite Sheets
 skelSheet = pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/skeleton.png')
@@ -56,10 +58,43 @@ class anItem(pygame.sprite.Sprite):
         self.image = itemArray[img]
         self.rect = self.image.get_rect()
         self.rect.center = (pos.x + 8, pos.y + 8)
+
+        self.dx = 0
+        self.dy = 0
+        self.pos = vec(pos.x+8,pos.y+8)
+        self.speed = 2
+        
     
-    def transform(self, P1):
+    def transform(self, P1,acc):
         self.image = pygame.transform.scale(self.image, (itemScale*8, itemScale*8))
-        self.rect.center = (P1.rect.left + 40, P1.rect.top+55)
+        
+        if P1.facing:
+            self.dx = (P1.pos.x-5) - self.pos.x
+        else:
+            self.dx = (P1.pos.x+72) - self.pos.x
+
+        # print("dx= " + str(self.dx))
+        if abs(self.dx) > 2:
+            if self.dx > 0:
+                self.pos.x += abs(P1.vel.x)*self.speed
+            else:
+                self.pos.x -= abs(P1.vel.x)*self.speed
+        
+        print(P1.facing)
+        # print("Y =" + str(self.pos.y))
+        if self.pos.y - (P1.pos.y-10) > 10:
+            if P1.vel.y != 0:
+                self.pos.y -= self.speed*abs(P1.vel.y)*0.5
+            else:
+                self.pos.y -= self.speed
+        elif (P1.pos.y-10) - self.pos.y > 10:
+            if P1.vel.y != 0:
+                self.pos.y += self.speed*abs(P1.vel.y)*0.5
+            else:
+                self.pos.y += self.speed
+
+        self.rect.center = self.pos
+
 
 class ProgressBar(pygame.sprite.Sprite):
     def __init__(self):
@@ -166,7 +201,7 @@ class spear(pygame.sprite.Sprite):
             self.image = pygame.transform.rotate(pygame.transform.scale(items.subsurface((32,128,16,16)), (itemScale*8, itemScale*8)),135)
         self.rect = self.image.get_rect()
         self.rect.center = pos
-        self.vel = vec(10*dir,0)
+        self.vel = vec(10*dir*(random.random()+1),0)
         self.acc = vec(-0.2*dir,0)
 
     def update(self):
@@ -176,7 +211,8 @@ class spear(pygame.sprite.Sprite):
         # self.image = pygame.transform.rotate( pygame.transform.scale(items.subsurface((32,128,16,16)), (itemScale*8, itemScale*8)), self.rotation)
         self.rect.center = self.pos
         collPlat = pygame.sprite.spritecollide(self, platforms, False)
-        if collPlat:
+        if collPlat and (collPlat[0].id > 81 or collPlat[0].id < 78):
+            print(collPlat[0].id)
             all_sprites.remove(self)
             spearGroup.remove(self)
         elif self.rect.colliderect(playerSprite):

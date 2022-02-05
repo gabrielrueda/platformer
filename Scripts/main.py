@@ -36,6 +36,10 @@ itemScale = 3
 bgScale = 8
 FramePerSec = pygame.time.Clock()
 
+# Music
+pygame.mixer.init()
+pygame.mixer.music.load(os.getcwd() + '/Assets/gamemusic2.mp3')
+
 
 #Font Variables
 font = pygame.font.Font(os.path.dirname(os.getcwd()) + '/platformer/Assets/font2.TTF', 16)
@@ -82,6 +86,7 @@ def addText():
 
 count = 0
 
+pygame.mixer.music.play(-1)
 while True:
     accel = vec(0,0.5)
     for event in pygame.event.get():
@@ -114,20 +119,18 @@ while True:
         accel.x = ACC
         if count %5 == 0:
             spriteData.playerSprite.animate(2)
-            for i in spriteData.humanSprite:
-                i.animate()
     elif moveLeft == True:
         accel.x = -ACC
         if count %5 == 0:
             spriteData.playerSprite.animate(0)
-            for i in spriteData.humanSprite:
-                i.animate()
     else:
          if count %10 == 0:
             spriteData.playerSprite.animate(1)
-            for i in spriteData.humanSprite:
-                i.animate()
 
+
+    if count%5 == 0:
+        for i in spriteData.humanSprite:
+            i.animate()
     # print(count)
     
     
