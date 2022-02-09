@@ -1,6 +1,7 @@
 import pygame
 import os
 
+
 black = pygame.Color(0, 0, 0)
 
 
