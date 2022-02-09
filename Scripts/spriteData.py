@@ -82,12 +82,12 @@ class anItem(pygame.sprite.Sprite):
         
         print(P1.facing)
         # print("Y =" + str(self.pos.y))
-        if self.pos.y - (P1.pos.y-10) > 10:
+        if self.pos.y - (P1.pos.y-10) > 2:
             if P1.vel.y != 0:
                 self.pos.y -= self.speed*abs(P1.vel.y)*0.5
             else:
                 self.pos.y -= self.speed
-        elif (P1.pos.y-10) - self.pos.y > 10:
+        elif (P1.pos.y-10) - self.pos.y > 2:
             if P1.vel.y != 0:
                 self.pos.y += self.speed*abs(P1.vel.y)*0.5
             else:

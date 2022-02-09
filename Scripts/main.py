@@ -65,6 +65,7 @@ itemArray = [
 ]
 
 
+pygame.mixer.music.play(-1)
 # Initalize Surface
 displaysurface = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Game")
@@ -72,6 +73,8 @@ pygame.display.set_caption("Game")
 while menus.update(displaysurface,FramePerSec,FPS) == False:
     pass
 
+while menus.levelSelector(displaysurface,FramePerSec,FPS) == False:
+    pass
 
 
 
@@ -86,7 +89,7 @@ def addText():
 
 count = 0
 
-pygame.mixer.music.play(-1)
+
 while True:
     accel = vec(0,0.5)
     for event in pygame.event.get():
