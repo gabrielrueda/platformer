@@ -22,7 +22,7 @@ blue = pygame.Color(0, 0, 255)
 
 # Global Constants
 HEIGHT = 608
-WIDTH = 1216
+WIDTH = 1216 
 FRIC = -0.2
 FPS = 60
 ACC = 0.4
