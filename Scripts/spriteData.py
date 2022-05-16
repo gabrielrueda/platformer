@@ -17,9 +17,9 @@ FRIC = -0.2
 
 
 # Sprite Sheets
-skelSheet = pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/skeleton.png')
-tileset = pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/tileset.png')
-items = pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/items.png')
+skelSheet = pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/tilesets/skeleton.png')
+tileset = pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/tilesets/tileset.png')
+items = pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/tilesets/items.png')
 
 
 ledgeId = [78,79,80,81,104,24,25,26,47,49,70,71,72]
@@ -127,26 +127,28 @@ indicatorGroup = pygame.sprite.Group()
 humanSprite = pygame.sprite.Group()
 spearGroup = pygame.sprite.Group()
 
-def processPlatformsItems():
-    file = open(os.getcwd() + '/Data/lvl1.txt', 'r')
+def processPlatformsItems(level):
+    file = open(os.getcwd() + '/Data/lvlData.txt', 'r')
     contents = file.readlines()
     for line in contents:
         plat = line.split(',')
-        if plat[0] == 'i':
-            for i in range(1,4):
-                plat[i] = (int)(plat[i])
-            it1 = anItem(plat[1], vec (plat[2], plat[3]))
-            itemsToGet[plat[1]] += 1
-            itemGroup.add(it1)
-        elif plat[0] == 'h':
-            for i in range(1,4):
-                plat[i] = (int)(plat[i])
-            t = playerData.getHuman(plat[1], plat[2],plat[3])
-            humanSprite.add(t)
+        if (int)(plat[0]) == level:
+            if plat[1] == 'i':
+                for i in range(2,5):
+                    plat[i] = (int)(plat[i])
+                it1 = anItem(plat[2], vec (plat[3], plat[4]))
+                itemsToGet[plat[2]] += 1
+                itemGroup.add(it1)
+            elif plat[1] == 'h':
+                for i in range(2,5):
+                    plat[i] = (int)(plat[i])
+                t = playerData.getHuman(plat[2], plat[3],plat[4])
+                humanSprite.add(t)
 
 
 def proPlats():
-    file = open(os.getcwd() + '/Data/lvl1Floor.csv', 'r')
+    # file = open(os.getcwd() + '/Data/lvl1Floor.csv', 'r')
+    file = open(os.getcwd() + '/Data/lvl2Floor.csv', 'r')
     contents = file.readlines()
     x = 0
     y= 0
@@ -172,8 +174,8 @@ def proPlats():
 
 
 #SpriteList
-def initSprites():
-    processPlatformsItems()
+def initSprites(level):
+    processPlatformsItems(level)
     proPlats()
     # Item Indicator Formation: 
     i = 0

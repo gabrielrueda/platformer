@@ -29,8 +29,8 @@ ACC = 0.4
 
 
 # Global Variables
-moveRight = False
-moveLeft = False
+# moveRight = False
+# moveLeft = False
 imgScale = 4
 itemScale = 3
 bgScale = 8
@@ -38,7 +38,7 @@ FramePerSec = pygame.time.Clock()
 
 # Music
 pygame.mixer.init()
-pygame.mixer.music.load(os.getcwd() + '/Assets/gamemusic2.mp3')
+pygame.mixer.music.load(os.getcwd() + '/Assets/sounds/gamemusic2.mp3')
 
 
 #Font Variables
@@ -47,38 +47,52 @@ font = pygame.font.Font(os.path.dirname(os.getcwd()) + '/platformer/Assets/font2
 
 
 # Sprite Sheets
-skelSheet = pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/skeleton.png')
-tileset = pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/tileset.png')
-items = pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/items.png')
+skelSheet = pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/tilesets/skeleton.png')
+tileset = pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/tilesets/tileset.png')
+items = pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/tilesets/items.png')
 
 # Images from Sprite Sheet
 skeleton = pygame.transform.scale(skelSheet.subsurface((4,25,11,14)), (imgScale*10, imgScale*14))
 regLedge = pygame.transform.scale(tileset.subsurface((80,24,7,7)), (imgScale*7, imgScale*7))
+
+
 background = pygame.transform.scale(tileset.subsurface((112,33,64,31)), (64*bgScale,31*bgScale))
-bg2 = pygame.transform.scale(pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/bg.png'),(WIDTH,HEIGHT))
 
-
-
-itemArray = [
-    pygame.transform.scale(items.subsurface((16,16,16,16)), (itemScale*16, itemScale*16)),
-    pygame.transform.scale(items.subsurface((32,16,16,16)), (itemScale*16, itemScale*16)), 
+lvlOutline = [
+    pygame.transform.scale(pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/bgLVL2.png'),(WIDTH,HEIGHT)), 
+    pygame.transform.scale(pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/bg.png'),(WIDTH,HEIGHT))
 ]
 
 
+
+
+# NOT USED HERE:
+
+# itemArray = [
+#     pygame.transform.scale(items.subsurface((16,16,16,16)), (itemScale*16, itemScale*16)),
+#     pygame.transform.scale(items.subsurface((32,16,16,16)), (itemScale*16, itemScale*16)), 
+# ]
+
+
 pygame.mixer.music.play(-1)
+
+
+
 # Initalize Surface
 displaysurface = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Game")
 
+
+# Go Through Menus
 while menus.update(displaysurface,FramePerSec,FPS) == False:
     pass
 
-while menus.levelSelector(displaysurface,FramePerSec,FPS) == False:
-    pass
+# while menus.levelSelector(displaysurface,FramePerSec,FPS) == False:
+#     pass
 
 
-
-spriteData.initSprites()
+level = 0
+spriteData.initSprites(level)
 
 def addText():
     i = 0
@@ -90,54 +104,52 @@ def addText():
 count = 0
 
 
+
+    # Game itself
+# for level in range(0,6):
+
+
 while True:
     accel = vec(0,0.5)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             quit()
+        # FOR JUMPING
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_RIGHT:
-                moveRight = True
-                moveLeft = False
-            if event.key == pygame.K_LEFT:
-                moveLeft = True
-                moveRight = False
             if event.key == pygame.K_x:
                 spriteData.playerSprite.jump()
-            if event.key == pygame.K_c:
-                spriteData.playerSprite.removeHealth(2)
-                ACC = 0.7
-        if event.type == pygame.KEYUP:
-            if event.key == pygame.K_RIGHT or event.key == pygame.K_LEFT:
-                moveRight = False
-                moveLeft = False
-            if event.key == pygame.K_c:
-                ACC = 0.4
-            
 
     count += 1
-    
-    if moveRight == True:
+
+
+    # FOR MOVEMENT: LEFT, RIGHT & BOOST
+    keys = pygame.key.get_pressed()
+
+    if keys[K_c]:
+        ACC = 0.7
+    else:
+        ACC = 0.4
+
+    if keys[K_RIGHT]:
         accel.x = ACC
         if count %5 == 0:
             spriteData.playerSprite.animate(2)
-    elif moveLeft == True:
+    elif keys[K_LEFT]:
         accel.x = -ACC
         if count %5 == 0:
             spriteData.playerSprite.animate(0)
     else:
-         if count %10 == 0:
+        if count %10 == 0:
             spriteData.playerSprite.animate(1)
 
 
+
     if count%5 == 0:
-        for i in spriteData.humanSprite:
-            i.animate()
-    # print(count)
-    
-    
-    # print(pygame.time.get_ticks())
+        for humans in spriteData.humanSprite:
+            humans.animate()
+
+
     spriteData.playerSprite.update(accel)
 
     displaysurface.fill(black)
@@ -146,23 +158,22 @@ while True:
         human.update()
 
 
-    # Blit Background
+    # Background is the mountatins and sky
     pygame.draw.rect(displaysurface, darkPurple, (0,0,WIDTH,75), 0)
     for i in range(0,4,1):
         displaysurface.blit(background, (i*bgScale*64, 75))
 
-    
-    displaysurface.blit(bg2, (0, 0))
+
+    # Level outline will show the trees, bushes, etc..
+    displaysurface.blit(lvlOutline[level], (0, 0))
 
     #Draw Health Bar
     pygame.draw.rect(displaysurface, red, (spriteData.healthBar.rect.left+60, spriteData.healthBar.rect.top+25,157*(spriteData.playerSprite.health/100),15))
-    
 
 
-    # pygame.draw.lines(displaysurface,red, True, [(50,100), (100,50), (150,100)])
     for spear in spriteData.spearGroup:
         spear.update()
-    
+
     spriteData.all_sprites.draw(displaysurface)
 
     addText()
@@ -178,4 +189,4 @@ while True:
     FramePerSec.tick(FPS)
 
 while True:
-   menus.endMenu(displaysurface, FramePerSec, FPS)
+    menus.endMenu(displaysurface, FramePerSec, FPS)

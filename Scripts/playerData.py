@@ -6,8 +6,8 @@ import spriteData
 
 vec = pygame.math.Vector2  # 2 for two dimensional
 
-skelSheet = pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/skeleton.png')
-fireSkelSheet = pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/skeleton_flame.png')
+skelSheet = pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/tilesets/skeleton.png')
+fireSkelSheet = pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/tilesets/skeleton_flame.png')
 
 HEIGHT = 600
 WIDTH = 1200
