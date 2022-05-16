@@ -59,8 +59,8 @@ regLedge = pygame.transform.scale(tileset.subsurface((80,24,7,7)), (imgScale*7, 
 background = pygame.transform.scale(tileset.subsurface((112,33,64,31)), (64*bgScale,31*bgScale))
 
 lvlOutline = [
+    pygame.transform.scale(pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/bg.png'),(WIDTH,HEIGHT)),
     pygame.transform.scale(pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/bgLVL2.png'),(WIDTH,HEIGHT)), 
-    pygame.transform.scale(pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/bg.png'),(WIDTH,HEIGHT))
 ]
 
 

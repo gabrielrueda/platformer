@@ -35,14 +35,14 @@ for i in range(0,6):
     
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self,x,y):
         super().__init__() 
         self.image = skeletonWalking[0]
         self.rect = self.image.get_rect()
-        self.rect.center = ((210,150))
+        self.rect.center = ((x,y))
         self.health = 100
 
-        self.pos = vec((180, 100))
+        self.pos = vec((x, y)) #180,100
         self.vel = vec(0,0)
         self.acc = vec(0,0)
         self.index = 0
@@ -77,7 +77,7 @@ class Player(pygame.sprite.Sprite):
                 
 
     def update(self,newACC):
-        # print("Health: ", self.health)
+        
         self.health -= 0.01
         time = pygame.time.get_ticks()
         # Movements:
@@ -199,5 +199,5 @@ class human(pygame.sprite.Sprite):
 def getHuman(y,min,max):
     return human(y,min,max)
 
-def getPlayer():
-    return Player()
+def getPlayer(x,y):
+    return Player(x,y)

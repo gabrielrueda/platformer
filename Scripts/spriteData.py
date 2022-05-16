@@ -122,7 +122,9 @@ itemGroup = pygame.sprite.Group()
 chestSprite = chest()
 healthBar = ProgressBar()
 all_sprites = pygame.sprite.Group()
-playerSprite = playerData.getPlayer()
+
+# global playerSprite
+# playerSprite = pygame.sprite.Sprite
 indicatorGroup = pygame.sprite.Group()
 humanSprite = pygame.sprite.Group()
 spearGroup = pygame.sprite.Group()
@@ -144,11 +146,16 @@ def processPlatformsItems(level):
                     plat[i] = (int)(plat[i])
                 t = playerData.getHuman(plat[2], plat[3],plat[4])
                 humanSprite.add(t)
+            elif plat[1] == 'p':
+                for i in range(2,4):
+                    plat[i] = (int)(plat[i])
+                return playerData.getPlayer(plat[2], plat[3])
+                
 
+floors = ['/Data/lvl1Floor.csv','/Data/lvl2Floor.csv']
 
-def proPlats():
-    # file = open(os.getcwd() + '/Data/lvl1Floor.csv', 'r')
-    file = open(os.getcwd() + '/Data/lvl2Floor.csv', 'r')
+def proPlats(level):
+    file = open(os.getcwd() + floors[level], 'r')
     contents = file.readlines()
     x = 0
     y= 0
@@ -175,22 +182,26 @@ def proPlats():
 
 #SpriteList
 def initSprites(level):
-    processPlatformsItems(level)
-    proPlats()
+    global playerSprite
+    playerSprite = processPlatformsItems(level)
+    proPlats(level)
+
     # Item Indicator Formation: 
     i = 0
     for j in range(0,len(itemsToGet)):
         if itemsToGet[j] != 0:
-            indicatorGroup.add(itemIndicator(j,i,itemsToGet[j]))
+            indicatorGroup.add(itemIndicator(j,j,itemsToGet[j]))
             i += 1
-    all_sprites.add(indicatorGroup)
-    all_sprites.add(ladders)
-    all_sprites.add(playerSprite)
-    all_sprites.add(chestSprite)
-    all_sprites.add(healthBar)
-    all_sprites.add(platforms)
-    all_sprites.add(itemGroup)
-    all_sprites.add(humanSprite)
+    
+    all_sprites.add(indicatorGroup, 
+        ladders, 
+        playerSprite, 
+        chestSprite, 
+        healthBar, 
+        platforms, 
+        itemGroup, 
+        humanSprite
+    )
 
 
 class spear(pygame.sprite.Sprite):
