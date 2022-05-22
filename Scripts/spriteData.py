@@ -35,11 +35,11 @@ itemArray = [
 ]
 
 class chest(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self,x,y):
         super().__init__()
         self.image = pygame.transform.scale(pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/chest.png'), (60,64))
         self.rect = self.image.get_rect()
-        self.rect.center = (40,280)
+        self.rect.center = (x,y)
 
 
 class platform(pygame.sprite.Sprite):
@@ -73,15 +73,13 @@ class anItem(pygame.sprite.Sprite):
         else:
             self.dx = (P1.pos.x+72) - self.pos.x
 
-        # print("dx= " + str(self.dx))
         if abs(self.dx) > 2:
             if self.dx > 0:
                 self.pos.x += abs(P1.vel.x)*self.speed
             else:
                 self.pos.x -= abs(P1.vel.x)*self.speed
         
-        print(P1.facing)
-        # print("Y =" + str(self.pos.y))
+
         if self.pos.y - (P1.pos.y-10) > 2:
             if P1.vel.y != 0:
                 self.pos.y -= self.speed*abs(P1.vel.y)*0.5
@@ -119,38 +117,37 @@ class itemIndicator(pygame.sprite.Sprite):
 platforms = pygame.sprite.Group()
 ladders = pygame.sprite.Group()
 itemGroup = pygame.sprite.Group()
-chestSprite = chest()
 healthBar = ProgressBar()
 all_sprites = pygame.sprite.Group()
 
-# global playerSprite
-# playerSprite = pygame.sprite.Sprite
+
 indicatorGroup = pygame.sprite.Group()
 humanSprite = pygame.sprite.Group()
 spearGroup = pygame.sprite.Group()
 
 def processPlatformsItems(level):
+    global chestSprite, playerSprite
+
     file = open(os.getcwd() + '/Data/lvlData.txt', 'r')
     contents = file.readlines()
     for line in contents:
-        plat = line.split(',')
-        if (int)(plat[0]) == level:
-            if plat[1] == 'i':
-                for i in range(2,5):
-                    plat[i] = (int)(plat[i])
-                it1 = anItem(plat[2], vec (plat[3], plat[4]))
-                itemsToGet[plat[2]] += 1
+        temp = line.split(',')
+        id = temp[0]
+        plat = list(map(int, temp[1:len(temp)]))
+        if plat[0] == level:
+            if id == 'i':
+                it1 = anItem(plat[1], vec (plat[2], plat[3]))
+                itemsToGet[plat[1]] += 1
                 itemGroup.add(it1)
-            elif plat[1] == 'h':
-                for i in range(2,5):
-                    plat[i] = (int)(plat[i])
-                t = playerData.getHuman(plat[2], plat[3],plat[4])
+            elif id == 'h':
+                t = playerData.getHuman(plat[1], plat[2],plat[3])
                 humanSprite.add(t)
-            elif plat[1] == 'p':
-                for i in range(2,4):
-                    plat[i] = (int)(plat[i])
-                return playerData.getPlayer(plat[2], plat[3])
-                
+            elif id == 'c':
+                chestSprite = chest(plat[1],plat[2])
+            elif id == 'p':
+                playerSprite = playerData.getPlayer(plat[1], plat[2])
+
+
 
 floors = ['/Data/lvl1Floor.csv','/Data/lvl2Floor.csv']
 
@@ -173,8 +170,7 @@ def proPlats(level):
             x += 32
         x = 0
         y += 32
-    
-    print("Count: " + str(len(platforms)))
+
                     
         
 
@@ -182,8 +178,7 @@ def proPlats(level):
 
 #SpriteList
 def initSprites(level):
-    global playerSprite
-    playerSprite = processPlatformsItems(level)
+    processPlatformsItems(level)
     proPlats(level)
 
     # Item Indicator Formation: 
@@ -202,6 +197,11 @@ def initSprites(level):
         itemGroup, 
         humanSprite
     )
+
+def removeAllSprites():
+    for sprite in all_sprites.sprites():
+        for group in sprite.groups():
+            group.remove(sprite)
 
 
 class spear(pygame.sprite.Sprite):
@@ -225,7 +225,6 @@ class spear(pygame.sprite.Sprite):
         self.rect.center = self.pos
         collPlat = pygame.sprite.spritecollide(self, platforms, False)
         if collPlat and (collPlat[0].id > 81 or collPlat[0].id < 78):
-            print(collPlat[0].id)
             all_sprites.remove(self)
             spearGroup.remove(self)
         elif self.rect.colliderect(playerSprite):

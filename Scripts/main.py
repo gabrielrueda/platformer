@@ -87,12 +87,9 @@ pygame.display.set_caption("Game")
 while menus.update(displaysurface,FramePerSec,FPS) == False:
     pass
 
-# while menus.levelSelector(displaysurface,FramePerSec,FPS) == False:
-#     pass
+while menus.levelSelector(displaysurface,FramePerSec,FPS) == False:
+    pass
 
-
-level = 0
-spriteData.initSprites(level)
 
 def addText():
     i = 0
@@ -105,88 +102,96 @@ count = 0
 
 
 
-    # Game itself
-# for level in range(0,6):
+# level = 0
+
+for level in range(0,2):
+    spriteData.initSprites(level)
+
+    while True:
+        accel = vec(0,0.5)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            # FOR JUMPING
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_x:
+                    spriteData.playerSprite.jump()
+
+        count += 1
 
 
-while True:
-    accel = vec(0,0.5)
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            quit()
-        # FOR JUMPING
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_x:
-                spriteData.playerSprite.jump()
+        # FOR MOVEMENT: LEFT, RIGHT & BOOST
+        keys = pygame.key.get_pressed()
 
-    count += 1
+        if keys[K_c]:
+            ACC = 0.7
+        else:
+            ACC = 0.4
 
-
-    # FOR MOVEMENT: LEFT, RIGHT & BOOST
-    keys = pygame.key.get_pressed()
-
-    if keys[K_c]:
-        ACC = 0.7
-    else:
-        ACC = 0.4
-
-    if keys[K_RIGHT]:
-        accel.x = ACC
-        if count %5 == 0:
-            spriteData.playerSprite.animate(2)
-    elif keys[K_LEFT]:
-        accel.x = -ACC
-        if count %5 == 0:
-            spriteData.playerSprite.animate(0)
-    else:
-        if count %10 == 0:
-            spriteData.playerSprite.animate(1)
+        if keys[K_RIGHT]:
+            accel.x = ACC
+            if count %5 == 0:
+                spriteData.playerSprite.animate(2)
+        elif keys[K_LEFT]:
+            accel.x = -ACC
+            if count %5 == 0:
+                spriteData.playerSprite.animate(0)
+        else:
+            if count %10 == 0:
+                spriteData.playerSprite.animate(1)
 
 
 
-    if count%5 == 0:
-        for humans in spriteData.humanSprite:
-            humans.animate()
+        if count%5 == 0:
+            for humans in spriteData.humanSprite:
+                humans.animate()
 
 
-    spriteData.playerSprite.update(accel)
+        spriteData.playerSprite.update(accel)
 
-    displaysurface.fill(black)
+        displaysurface.fill(black)
 
-    for human in spriteData.humanSprite:
-        human.update()
-
-
-    # Background is the mountatins and sky
-    pygame.draw.rect(displaysurface, darkPurple, (0,0,WIDTH,75), 0)
-    for i in range(0,4,1):
-        displaysurface.blit(background, (i*bgScale*64, 75))
+        for human in spriteData.humanSprite:
+            human.update()
 
 
-    # Level outline will show the trees, bushes, etc..
-    displaysurface.blit(lvlOutline[level], (0, 0))
+        # Background is the mountatins and sky
+        pygame.draw.rect(displaysurface, darkPurple, (0,0,WIDTH,75), 0)
+        for i in range(0,4,1):
+            displaysurface.blit(background, (i*bgScale*64, 75))
 
-    #Draw Health Bar
-    pygame.draw.rect(displaysurface, red, (spriteData.healthBar.rect.left+60, spriteData.healthBar.rect.top+25,157*(spriteData.playerSprite.health/100),15))
+
+        # Level outline will show the trees, bushes, etc..
+        displaysurface.blit(lvlOutline[level], (0, 0))
+
+        #Draw Health Bar
+        pygame.draw.rect(displaysurface, red, (spriteData.healthBar.rect.left+60, spriteData.healthBar.rect.top+25,157*(spriteData.playerSprite.health/100),15))
 
 
-    for spear in spriteData.spearGroup:
-        spear.update()
+        for spear in spriteData.spearGroup:
+            spear.update()
 
-    spriteData.all_sprites.draw(displaysurface)
+        spriteData.all_sprites.draw(displaysurface)
 
-    addText()
+        addText()
 
-    pygame.display.update()
+        pygame.display.update()
 
-    if spriteData.playerSprite.health <= 0:
-        break
+        if spriteData.playerSprite.health <= 0:
+            break
 
-    if spriteData.itemsToGet.count(0) == len(spriteData.itemsToGet):
-        break
+        if spriteData.itemsToGet.count(0) == len(spriteData.itemsToGet):
+            break
 
-    FramePerSec.tick(FPS)
+        FramePerSec.tick(FPS)
 
-while True:
-    menus.endMenu(displaysurface, FramePerSec, FPS)
+    spriteData.removeAllSprites()
+
+
+
+
+
+
+# while True:
+#     menus.endMenu(displaysurface, FramePerSec, FPS)
