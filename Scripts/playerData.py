@@ -9,8 +9,8 @@ vec = pygame.math.Vector2  # 2 for two dimensional
 skelSheet = pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/tilesets/skeleton.png')
 fireSkelSheet = pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/tilesets/skeleton_flame.png')
 
-HEIGHT = 600
-WIDTH = 1200
+HEIGHT = 896
+WIDTH = 1536
 ACC = 0.45
 FRIC = -0.2
 FPS = 60
@@ -52,31 +52,32 @@ class Player(pygame.sprite.Sprite):
 
     def jump(self):
         if self.jumpAllowed:
-            self.vel.y = -10
+            self.vel.y = -15
             self.health -= 0.07
     
     def removeHealth(self,amount):
         self.health -= amount
     
     def animate(self,type):
-        if(self.index < len(walkingPattern)-1):
-            self.index += 1
-        else:
-            self.index = 0
-        
+
         if self.vel.y == 0:
-            if type == 0:
-                self.image = pygame.transform.flip(skeletonWalking[walkingPattern[self.index]], True, False)
-            elif type == 2:
-                self.image = skeletonWalking[walkingPattern[self.index]]
+            if(self.index < len(walkingPattern)-1):
+                self.index += 1
             else:
-                if self.facing:
-                    self.image = skeletonWalking[idlePattern[self.index]]
-                else:
-                    self.image = pygame.transform.flip(skeletonWalking[idlePattern[self.index]], True, False)
+                self.index = 0
+        
+        if type == 0:
+            self.image = pygame.transform.flip(skeletonWalking[walkingPattern[self.index]], True, False)
+        elif type == 2:
+            self.image = skeletonWalking[walkingPattern[self.index]]
+        else:
+            if self.facing:
+                self.image = skeletonWalking[idlePattern[self.index]]
+            else:
+                self.image = pygame.transform.flip(skeletonWalking[idlePattern[self.index]], True, False)
                 
 
-    def update(self,newACC):
+    def update(self,newACC, down_pressed, up_pressed, z_pressed):
         
         self.health -= 0.01
         time = pygame.time.get_ticks()
@@ -87,21 +88,38 @@ class Player(pygame.sprite.Sprite):
         if fireCollion:
             self.health -= 0.5
 
-        ladderCollide = pygame.sprite.spritecollide(self, spriteData.ladders, False)
-        if ladderCollide:
-            self.vel.y = -4
+        originalRect = self.rect.copy()
+
+        if down_pressed:
+            self.acc.x = 0
+            self.rect.update(self.rect.left, self.rect.top+61, self.rect.width, 2)
+            ladderCollide = pygame.sprite.spritecollide(self, spriteData.ladders, False)
+            if ladderCollide:
+                self.vel.y = 6
+        elif up_pressed:
+            self.acc.x = 0
+            self.rect.update(self.rect.left, self.rect.top+50, self.rect.width, self.rect.height-50)
+            ladderCollide = pygame.sprite.spritecollide(self, spriteData.ladders, False)
+            if ladderCollide:
+                self.vel.y = -6
+        else:
+            ladderCollide = None
+
+        self.rect.update(originalRect)
 
         # self.pos += self.vel
          
-        if self.pos.x > WIDTH:
-            self.pos.x = 0
-        if self.pos.x < 0:
-            self.pos.x = WIDTH
 
         self.acc.x += self.vel.x * FRIC
         self.vel += self.acc
         dx = self.vel.x + 0.5*self.acc.x
         dy = self.vel.y + 0.5*self.acc.y
+
+        # print(str(self.rect) + " VS " + str(self.rect.inflate(20,20)))
+
+        if self.pos.x+dx > WIDTH-self.rect.width or self.pos.x+dx < 0:
+            dx = 0
+
 
 
         # New Collision Code
@@ -125,7 +143,7 @@ class Player(pygame.sprite.Sprite):
         # Chest collision:
         if spriteData.chestSprite.rect.colliderect(self.pos.x+dx,self.pos.y-1, 52,60):
             dx = 0
-            if self.inventory != None:
+            if self.inventory != None and z_pressed:
                 spriteData.itemsToGet[self.inventory.id] -= 1
                 spriteData.itemGroup.remove(self.inventory)
                 spriteData.all_sprites.remove(self.inventory)
@@ -135,16 +153,7 @@ class Player(pygame.sprite.Sprite):
             self.vel.y = 0
             dy = spriteData.chestSprite.rect.top - self.rect.bottom
 
-       
-
-        # Check item collision 
-        if self.inventory == None:
-            collect = pygame.sprite.spritecollide(self, spriteData.itemGroup, False)
-            if collect:
-                self.inventory = collect[0]
-        else:
-            self.inventory.transform(self,self.acc)
-
+    
         if dx > 0:
             self.facing = True
         elif dx < 0:
@@ -154,6 +163,15 @@ class Player(pygame.sprite.Sprite):
         self.pos.x += dx
         self.pos.y += dy
         self.rect.topleft = self.pos 
+
+        # Check item collision 
+        if self.inventory == None:
+            if z_pressed:
+                collect = pygame.sprite.spritecollide(self, spriteData.itemGroup, False)
+                if collect:
+                    self.inventory = collect[0]
+        else:
+            self.inventory.transform(self)
 
 class human(pygame.sprite.Sprite):
     def __init__(self,y,min,max):

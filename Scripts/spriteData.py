@@ -13,6 +13,8 @@ vec = pygame.math.Vector2  # 2 for two dimensional
 
 imgScale = 4
 itemScale = 3
+itemScale2 = 3
+itemScaleTemp = 2
 FRIC = -0.2
 
 
@@ -21,17 +23,29 @@ skelSheet = pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets
 tileset = pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/tilesets/tileset.png')
 items = pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/tilesets/items.png')
 
+items3 = pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/tilesets/item3.png')
 
 ledgeId = [78,79,80,81,104,24,25,26,47,49,70,71,72]
 
 
 
+# itemArray = [
+#     pygame.transform.scale(items.subsurface((16,16,16,16)), (itemScale2*16, itemScale2*16)),
+#     pygame.transform.scale(items.subsurface((32,16,16,16)), (itemScale2*16, itemScale2*16)),
+#     pygame.transform.scale(items.subsurface((16,32,16,16)), (itemScale2*16, itemScale2*16)), 
+#     pygame.transform.scale(items.subsurface((48,16,16,16)), (itemScale2*16, itemScale2*16)), 
+#     pygame.transform.scale(items.subsurface((16,64,16,16)), (itemScale2*16, itemScale2*16)), 
+# ]
+
+
 itemArray = [
-    pygame.transform.scale(items.subsurface((16,16,16,16)), (itemScale*16, itemScale*16)),
-    pygame.transform.scale(items.subsurface((32,16,16,16)), (itemScale*16, itemScale*16)),
-    pygame.transform.scale(items.subsurface((16,32,16,16)), (itemScale*16, itemScale*16)), 
-    pygame.transform.scale(items.subsurface((48,16,16,16)), (itemScale*16, itemScale*16)), 
-    pygame.transform.scale(items.subsurface((16,64,16,16)), (itemScale*16, itemScale*16)), 
+    pygame.transform.scale(items3.subsurface((0,0,8,8)), (itemScaleTemp*16, itemScaleTemp*16)),
+    pygame.transform.scale(items3.subsurface((0,16,8,8)), (itemScaleTemp*16, itemScaleTemp*16)),
+    pygame.transform.scale(items3.subsurface((0,32,8,8)), (itemScaleTemp*16, itemScaleTemp*16)), 
+    pygame.transform.scale(items3.subsurface((0,40,8,8)), (itemScaleTemp*16, itemScaleTemp*16)), 
+    pygame.transform.scale(items3.subsurface((0,56,8,8)), (itemScaleTemp*16, itemScaleTemp*16)), 
+    pygame.transform.scale(items3.subsurface((0,72,8,8)), (itemScaleTemp*16, itemScaleTemp*16)), 
+
 ]
 
 class chest(pygame.sprite.Sprite):
@@ -62,36 +76,23 @@ class anItem(pygame.sprite.Sprite):
         self.dx = 0
         self.dy = 0
         self.pos = vec(pos.x+8,pos.y+8)
-        self.speed = 2
+        self.speed = 10
         
-    
-    def transform(self, P1,acc):
+
+    def transform(self,P1):
         self.image = pygame.transform.scale(self.image, (itemScale*8, itemScale*8))
-        
         if P1.facing:
-            self.dx = (P1.pos.x-5) - self.pos.x
+            dirvect = pygame.math.Vector2(P1.rect.x - 30 - self.rect.x, P1.rect.y - 10 - self.rect.y)
         else:
-            self.dx = (P1.pos.x+72) - self.pos.x
+            dirvect = pygame.math.Vector2(P1.rect.x + 56 - self.rect.x, P1.rect.y - 10 - self.rect.y)
 
-        if abs(self.dx) > 2:
-            if self.dx > 0:
-                self.pos.x += abs(P1.vel.x)*self.speed
-            else:
-                self.pos.x -= abs(P1.vel.x)*self.speed
-        
+        dist = dirvect.length()
+        if(dist > 10):
+            dirvect.normalize()
+            dirvect.scale_to_length(self.speed * (dist/30))
+            self.rect.move_ip(dirvect)
 
-        if self.pos.y - (P1.pos.y-10) > 2:
-            if P1.vel.y != 0:
-                self.pos.y -= self.speed*abs(P1.vel.y)*0.5
-            else:
-                self.pos.y -= self.speed
-        elif (P1.pos.y-10) - self.pos.y > 2:
-            if P1.vel.y != 0:
-                self.pos.y += self.speed*abs(P1.vel.y)*0.5
-            else:
-                self.pos.y += self.speed
 
-        self.rect.center = self.pos
 
 
 class ProgressBar(pygame.sprite.Sprite):
@@ -149,7 +150,7 @@ def processPlatformsItems(level):
 
 
 
-floors = ['/Data/lvl1Floor.csv','/Data/lvl2Floor.csv']
+floors = ['/Data/lvl1Big.csv','/Data/lvl2Floor.csv']
 
 def proPlats(level):
     file = open(os.getcwd() + floors[level], 'r')

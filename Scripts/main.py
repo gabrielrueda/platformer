@@ -21,8 +21,8 @@ blue = pygame.Color(0, 0, 255)
 # empty = pygame.Color(255,255,255,0)
 
 # Global Constants
-HEIGHT = 608
-WIDTH = 1216 
+HEIGHT = 896
+WIDTH = 1536 
 FRIC = -0.2
 FPS = 60
 ACC = 0.4
@@ -58,8 +58,13 @@ regLedge = pygame.transform.scale(tileset.subsurface((80,24,7,7)), (imgScale*7, 
 
 background = pygame.transform.scale(tileset.subsurface((112,33,64,31)), (64*bgScale,31*bgScale))
 
+# lvlOutline = [
+#     pygame.transform.scale(pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/bg.png'),(WIDTH,HEIGHT)),
+#     pygame.transform.scale(pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/bgLVL2.png'),(WIDTH,HEIGHT)), 
+# ]
+
 lvlOutline = [
-    pygame.transform.scale(pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/bg.png'),(WIDTH,HEIGHT)),
+    pygame.transform.scale(pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/level1Larger.png'),(WIDTH,HEIGHT)),
     pygame.transform.scale(pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/bgLVL2.png'),(WIDTH,HEIGHT)), 
 ]
 
@@ -104,19 +109,20 @@ count = 0
 
 # level = 0
 
+
 for level in range(0,2):
     spriteData.initSprites(level)
 
     while True:
-        accel = vec(0,0.5)
+        # For Finding Position of Spots:
+        # mouse = pygame.mouse.get_pos()
+        # print("(" + str(mouse[0]) + ", " + str(mouse[1]) + ")")
+
+        accel = vec(0,1.2) # Falling Speed
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
-            # FOR JUMPING
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_x:
-                    spriteData.playerSprite.jump()
 
         count += 1
 
@@ -125,9 +131,12 @@ for level in range(0,2):
         keys = pygame.key.get_pressed()
 
         if keys[K_c]:
-            ACC = 0.7
+            ACC = 1.2 # Running Speed
         else:
-            ACC = 0.4
+            ACC = 0.8 # Walking Speed
+
+        if keys[K_x]:
+            spriteData.playerSprite.jump()
 
         if keys[K_RIGHT]:
             accel.x = ACC
@@ -148,7 +157,7 @@ for level in range(0,2):
                 humans.animate()
 
 
-        spriteData.playerSprite.update(accel)
+        spriteData.playerSprite.update(accel, keys[K_DOWN], keys[K_UP], keys[K_z])
 
         displaysurface.fill(black)
 
