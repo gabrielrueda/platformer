@@ -23,6 +23,8 @@ skelSheet = pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets
 tileset = pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/tilesets/tileset.png')
 items = pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/tilesets/items.png')
 
+chests = pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/tilesets/chest.png')
+
 items3 = pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/tilesets/item3.png')
 
 ledgeId = [78,79,80,81,104,24,25,26,47,49,70,71,72]
@@ -48,12 +50,35 @@ itemArray = [
 
 ]
 
+chestArray = [
+    pygame.transform.scale(chests.subsurface((97,46,14,18)), (14*4,18*4)),
+    pygame.transform.scale(chests.subsurface((113,46,14,18)), (14*4,18*4)),
+    pygame.transform.scale(chests.subsurface((129,46,14,18)), (14*4,18*4)),
+    pygame.transform.scale(chests.subsurface((145,46,14,18)), (14*4,18*4)),
+    pygame.transform.scale(chests.subsurface((161,46,14,18)), (14*4,18*4)),
+    pygame.transform.scale(chests.subsurface((177,46,14,18)), (14*4,18*4))
+
+]
+
 class chest(pygame.sprite.Sprite):
     def __init__(self,x,y):
         super().__init__()
-        self.image = pygame.transform.scale(pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/chest.png'), (60,64))
+        self.image = chestArray[0]
         self.rect = self.image.get_rect()
         self.rect.center = (x,y)
+        self.index = 0;
+    
+    def update(self,playerX):
+        diff = abs(self.rect.centerx-playerX)
+        if diff < 70 and self.index != 5:
+            self.index += 1
+            self.image = chestArray[self.index]
+        elif diff > 70 and self.index != 0:
+            self.index -= 1
+            self.image = chestArray[self.index]
+
+
+            
 
 
 class platform(pygame.sprite.Sprite):
@@ -91,6 +116,8 @@ class anItem(pygame.sprite.Sprite):
             dirvect.normalize()
             dirvect.scale_to_length(self.speed * (dist/30))
             self.rect.move_ip(dirvect)
+    
+    # def toChest(self,chest):
 
 
 
@@ -98,9 +125,9 @@ class anItem(pygame.sprite.Sprite):
 class ProgressBar(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pygame.transform.scale(pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/ProgressBar.png'), (225, 47))
+        self.image = pygame.transform.scale(pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/newProgressBar2.png'), (56*4, 9*4))
         self.rect = self.image.get_rect()
-        self.rect.center = 1050,50
+        self.rect.center = 1370,28
 
 
 class itemIndicator(pygame.sprite.Sprite):
@@ -112,7 +139,7 @@ class itemIndicator(pygame.sprite.Sprite):
         self.amount = amount
         self.imgNum = img
         self.rect.center = (50+(num*100),30)
-        self.color = self.image.unmap_rgb(pixel[(22,22)])
+        self.color = self.image.unmap_rgb(pixel[(16,18)])
 
 
 platforms = pygame.sprite.Group()
@@ -150,7 +177,7 @@ def processPlatformsItems(level):
 
 
 
-floors = ['/Data/lvl1Big.csv','/Data/lvl2Floor.csv']
+floors = ['/Data/lvl1Big.csv','/Data/lvl2Big.csv','/Data/lvl3Big.csv','/Data/lvl4Big.csv','/Data/lvl5Big.csv']
 
 def proPlats(level):
     file = open(os.getcwd() + floors[level], 'r')
@@ -208,27 +235,26 @@ def removeAllSprites():
 class spear(pygame.sprite.Sprite):
     def __init__(self,pos,dir):
         super().__init__()
-        self.pos = vec(pos[0], pos[1]-20)
+        self.pos = vec(pos[0], pos[1]-23)
         if dir > 0:
-            self.image = pygame.transform.rotate(pygame.transform.scale(items.subsurface((32,128,16,16)), (itemScale*8, itemScale*8)),-45)
+            self.image = pygame.transform.rotate(pygame.transform.scale(pygame.image.load(os.path.dirname(os.getcwd()) + "/platformer/Assets/arrow.png"), (itemScale*7, itemScale*7)),45)
         else:
-            self.image = pygame.transform.rotate(pygame.transform.scale(items.subsurface((32,128,16,16)), (itemScale*8, itemScale*8)),135)
+            self.image = pygame.transform.rotate(pygame.transform.scale(pygame.image.load(os.path.dirname(os.getcwd()) + "/platformer/Assets/arrow.png"), (itemScale*7, itemScale*7)),-135)
+
         self.rect = self.image.get_rect()
         self.rect.center = pos
-        self.vel = vec(10*dir*(random.random()+1),0)
-        self.acc = vec(-0.2*dir,0)
+        self.vel = vec(30*dir,0)
+        self.acc = vec(2*dir,0)
 
     def update(self):
         self.acc.x += self.vel.x * 0.001
-        self.vel += self.acc
-        self.pos += self.vel + 0.5 * self.acc
-        # self.image = pygame.transform.rotate( pygame.transform.scale(items.subsurface((32,128,16,16)), (itemScale*8, itemScale*8)), self.rotation)
+        self.pos += self.vel 
         self.rect.center = self.pos
         collPlat = pygame.sprite.spritecollide(self, platforms, False)
         if collPlat and (collPlat[0].id > 81 or collPlat[0].id < 78):
             all_sprites.remove(self)
             spearGroup.remove(self)
-        elif self.rect.colliderect(playerSprite):
+        if self.rect.colliderect(playerSprite):
             playerSprite.removeHealth(2)
             all_sprites.remove(self)
             spearGroup.remove(self)

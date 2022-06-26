@@ -27,7 +27,18 @@ levelFive = pygame.transform.scale(pygame.image.load(os.path.dirname(os.getcwd()
 levelFiveD = pygame.transform.scale(pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/levelSelector/levelFiveD.png'), (154,154))
 
 
-gameover = pygame.transform.scale(pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/gameover.png'), (700,90))
+
+
+
+helpScreenIMG = [
+    pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/story1.png'),
+    pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/story2.png'),
+    pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/help1.png'),
+    pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/help2.png'),
+    pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/helpBG.png')
+]
+
+
 
 buttonPos = [623,465]
 
@@ -85,6 +96,35 @@ def levelSelector(displaysurface, FramePerSec, FPS):
     displaysurface.blit(levelFourD, (725,150))
     displaysurface.blit(levelFiveD, (919,150))
 
+
+
+    pygame.display.update()
+    FramePerSec.tick(FPS)
+    return False
+
+ 
+helpIndex = 0
+
+def helpScreen(displaysurface,FramePerSec, FPS):
+    global helpIndex
+    clicked = False
+    displaysurface.fill(black)
+    
+    mouse = pygame.mouse.get_pos()
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            quit()
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_c:
+                helpIndex += 1
+                if helpIndex == 4:
+                    return True
+
+
+    
+    displaysurface.blit(helpScreenIMG[4], (0,0))
+    displaysurface.blit(helpScreenIMG[helpIndex], (0,0))
 
 
     pygame.display.update()
