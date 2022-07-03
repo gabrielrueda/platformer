@@ -4,14 +4,21 @@ import os
 import math
 import spriteData
 import random
+import sys
+
+
 
 vec = pygame.math.Vector2  # 2 for two dimensional
 
-skelSheet = pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/tilesets/Archer-Purple.png')
-fireSkelSheet = pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/tilesets/Archer-Purple.png')
+# archer = pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/tilesets/Archer-Purple.png')
 
 
-wizard = pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/tilesets/Mage-Red.png')
+# wizard = pygame.image.load(os.path.dirname(os.getcwd()) + '/platformer/Assets/tilesets/Mage-Red.png')
+
+archer = pygame.image.load('../Assets/tilesets/Archer-Purple.png')
+
+
+wizard = pygame.image.load('../Assets/tilesets/Mage-Red.png')
 
 
 HEIGHT = 896
@@ -48,7 +55,7 @@ for i in range(0,4):
 personWalking = []
 
 for i in range(0,12):
-    personWalking.append(pygame.transform.scale(fireSkelSheet.subsurface((9+(32*i),68,14,20)), (imgScale*14, imgScale*20)))
+    personWalking.append(pygame.transform.scale(archer.subsurface((9+(32*i),68,14,20)), (imgScale*14, imgScale*20)))
     
 
 class Player(pygame.sprite.Sprite):
@@ -71,7 +78,7 @@ class Player(pygame.sprite.Sprite):
     def jump(self):
         if self.jumpAllowed:
             self.vel.y = -15
-            self.health -= 0.07
+            self.health -= 0.15
     
     def removeHealth(self,amount):
         self.health -= amount
