@@ -1,0 +1,5 @@
+ *.html linguist-vendored
+ *.png linguist-vendored
+ *.jpg linguist-vendored
+ *.mp3 linguist-vendored
+ *.csv linguist-vendored
